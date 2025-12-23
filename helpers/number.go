@@ -61,6 +61,10 @@ func MaxNumberWithOrder(s string, k int) string {
 	return string(stack[:k])
 }
 
+func Between(v, from, to int64) bool {
+	return v >= from && v <= to
+}
+
 // Return max element in an int array
 func Max(array []int) int {
 	max := 0

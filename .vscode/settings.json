@@ -1,0 +1,14 @@
+{
+    // Explicitly set Go binary path for VS Code Go extension
+    "go.alternateTools": {
+        "go": "~/Desktop/golang/goenv/versions/1.25.5/bin/go"
+    },
+    // Optional: Set environment variables for Go
+    "go.toolsEnvVars": {
+        "GOROOT": "~/Desktop/golang/goenv/versions/1.25.5",
+        "GOPATH": "${workspaceFolder}/.gopath",
+        "PATH": "~/Desktop/golang/goenv/versions/1.25.5/bin:${env:PATH}"
+    },
+    // Optional: Enable Go test flags for debugging
+    "go.testFlags": ["-v"]
+}

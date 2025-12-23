@@ -1,6 +1,8 @@
 package day5
 
 import (
+	"slices"
+	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -16,6 +18,10 @@ type Range struct {
 type List struct {
 	Ranges      []Range
 	Ingredients []int64
+}
+
+type Pair struct {
+	X, Y int64
 }
 
 func parse(filename string) *List {
@@ -109,33 +115,68 @@ func findIngredients(list *List) (fresh, spoiled int64) {
 	return
 }
 
-func findIngredients2(list *List) map[int64]int {
+func MergeRanges(r1, r2 *Range) (bool, *Range) {
+	r := r1
+	merged := false
+	if helpers.Between(r1.From, r2.From, r2.To) ||
+		helpers.Between(r1.To, r1.From, r1.To) {
+		r.From = min(r1.From, r2.From)
+		r.To = max(r1.To, r2.To)
+		merged = true
+	}
+
+	return merged, r
+}
+
+func findIngredients2(list *List) int64 {
 	var wg sync.WaitGroup
-	ings := len(list.Ingredients)
 	var mu sync.Mutex
-	sem := make(chan struct{}, ings)
-	fresh := make(map[int64]int)
+	events := make([]Pair, 0)
 
-	for _, r := range list.Ranges {
+	for i := 0; i < len(list.Ranges); i++ {
 		wg.Go(func() {
-			<-sem
-
-			for j := r.From; j <= r.To; j++ {
-				mu.Lock()
-				fresh[j]++
-				mu.Unlock()
-			}
+			r := list.Ranges[i]
+			mu.Lock()
+			events = append(events, Pair{
+				X: r.From,
+				Y: +1,
+			})
+			events = append(events, Pair{
+				X: r.To + 1,
+				Y: -1,
+			})
+			mu.Unlock()
 		})
 	}
 
-	for range ings {
-		sem <- struct{}{}
+	wg.Wait()
+
+	sort.Slice(events, func(i, j int) bool {
+		return events[i].X < events[j].X
+	})
+
+	ranges := make([]int64, 0)
+	active := int32(0)
+	i := 0
+	// TODO if i < 1 should fail
+	for {
+		from := events[i]
+		to := events[i+1]
+		atomic.AddInt32(&active, int32(from.Y))
+		print("(", from.X, ", ", to.X, ") active = ", active, "\n")
+		for j := from.X; j < to.X; j++ {
+			mu.Lock()
+			if !slices.Contains(ranges, j) {
+				ranges = append(ranges, j)
+			}
+			mu.Unlock()
+		}
+		atomic.AddInt32(&active, int32(to.Y))
 	}
 
-	wg.Wait()
-	close(sem)
+	// wg.Wait()
 
-	return fresh
+	return int64(len(ranges))
 }
 
 func puzzle1(filename string) int64 {
@@ -148,6 +189,6 @@ func puzzle1(filename string) int64 {
 func puzzle2(filename string) int64 {
 	list := parse(filename)
 
-	fresh := findIngredients2(list)
-	return int64(len(fresh))
+	total := findIngredients2(list)
+	return total
 }
