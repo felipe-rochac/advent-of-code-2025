@@ -1,4 +1,4 @@
-package template
+package day9
 
 import (
 	"testing"
@@ -9,19 +9,19 @@ import (
 func TestPuzzle1_Test(t *testing.T) {
 	result := puzzle1("test.txt")
 
-	helpers.AssertEqual(result, 21)
+	helpers.AssertEqual(result, 50)
 }
 
 func TestPuzzle1_Input(t *testing.T) {
 	result := puzzle1("input.txt")
 
-	helpers.AssertEqual(result, 1619)
+	helpers.AssertEqual(result, 4773451098)
 }
 
 func TestPuzzle2_Test(t *testing.T) {
 	result := puzzle2("test.txt")
 
-	helpers.AssertEqual(result, 40)
+	helpers.AssertEqual(result, 24)
 }
 
 func TestPuzzle2_Input(t *testing.T) {

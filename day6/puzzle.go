@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/felipe-rochac/advent-of-code-2025/helpers"
 )
@@ -185,13 +186,16 @@ func puzzle2(filename string) int64 {
 		})
 	}
 
+	var total int64 = 0
+
+	go func() {
+		for sum := range sumCh {
+			atomic.AddInt64(&total, sum)
+		}
+	}()
+
 	wg.Wait()
 	close(sumCh)
-
-	var total int64 = 0
-	for s := range sumCh {
-		total += s
-	}
 
 	return total
 }
