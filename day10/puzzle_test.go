@@ -1,4 +1,4 @@
-package day9
+package day10
 
 import (
 	"testing"
@@ -9,24 +9,23 @@ import (
 func TestPuzzle1_Test(t *testing.T) {
 	result := puzzle1("test.txt")
 
-	helpers.AssertEqual(result, 50)
+	helpers.AssertEqual(result, 7)
 }
 
 func TestPuzzle1_Input(t *testing.T) {
 	result := puzzle1("input.txt")
 
-	helpers.AssertEqual(result, 4773451098)
+	helpers.AssertEqual(result, 491)
 }
 
 func TestPuzzle2_Test(t *testing.T) {
 	result := puzzle2("test.txt")
 
-	helpers.AssertEqual(result, 24)
+	helpers.AssertEqual(result, 0)
 }
 
 func TestPuzzle2_Input(t *testing.T) {
 	result := puzzle2("input.txt")
 
-	helpers.AssertBiggerThan(result, 194739589)
 	helpers.AssertEqual(result, 0)
 }

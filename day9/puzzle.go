@@ -56,60 +56,63 @@ func puzzle1(filename string) int64 {
 	return int64(max)
 }
 
-func greenTiles(redTiles []tile) []tile {
-	var wg sync.WaitGroup
-	syncCh := make(chan []tile, len(redTiles))
-
-	for i, t := range redTiles {
-		wg.Go(func() {
-			greenTiles := make([]tile, 0)
-			for j := i + 1; j < len(redTiles); j++ {
-
-			}
-		})
-	}
-}
-
 func puzzle2(filename string) int64 {
 	tiles := parse(filename)
 
-	// should frm a rectagle from objects that shares same coordinate
+	// should find 3 coordinates to form a rectangle
 	stack := helpers.Stack[[]*tile]{}
 
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 
+	hasEdge := func(x, y int) bool {
+		for _, t := range tiles {
+			if t.X == x && t.Y == y {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	maxDistance := 0
 	for i, t := range tiles {
 		wg.Go(func() {
-			group := []*tile{t}
 			for j := i + 1; j < len(tiles); j++ {
-				if t.X == tiles[j].X || t.Y == tiles[j].Y {
-					group = append(group, tiles[j])
+				t2 := tiles[j]
+
+				distance := helpers.EuclidianDistance(t.X, t.Y, 0, t2.X, t2.Y, 0)
+
+				if distance < maxDistance {
+					continue
 				}
 
-				if len(group) == 2 {
+				// only add to stack that have an 3d edge
+				if hasEdge(t.X, t2.Y) || hasEdge(t2.X, t.Y) {
 					mu.Lock()
-					stack.Push(group)
-					group = []*tile{t}
+					stack.Push([]*tile{t, t2})
+					maxDistance = distance
 					mu.Unlock()
-
 				}
 			}
-
 		})
 	}
 
 	wg.Wait()
 
 	maxArea := 0
+	var maxRange []*tile
 	for !stack.IsEmpty() {
 		t := stack.Pop()
 		area := helpers.Area(t[0].X, t[0].Y, 0, t[1].X, t[1].Y, 0)
 
 		if area > maxArea {
 			maxArea = area
+			maxRange = []*tile{t[0], t[1]}
 		}
 	}
 
-	return 0
+	print("Biggest rectagle found at (", maxRange[0].X, ",", maxRange[0].Y, ") - (", maxRange[1].X, ",", maxRange[1].Y, ")")
+
+	return int64(maxArea)
 }

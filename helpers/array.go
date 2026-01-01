@@ -18,6 +18,7 @@ func RotateMatrix[T any](m [][]T) [][]T {
 
 	return r
 }
+
 func ReverseArray[T any](arr []T) []T {
 	n := len(arr)
 	res := make([]T, n)
@@ -27,3 +28,26 @@ func ReverseArray[T any](arr []T) []T {
 	return res
 }
 
+func CombineElements[T any](arr []T) [][]T {
+	var combine func(start int, comb []T)
+	n := len(arr)
+	result := [][]T{}
+
+	combine = func(start int, comb []T) {
+		if len(comb) > 0 {
+			tmp := make([]T, len(comb))
+			copy(tmp, comb)
+			result = append(result, tmp)
+		}
+		for i := start; i < n; i++ {
+			comb = append(comb, arr[i])
+			combine(i+1, comb)
+			comb = comb[:len(comb)-1]
+		}
+	}
+
+	combine(0, []T{})
+	// result now contains all combinations of all possible sizes
+
+	return result
+}
